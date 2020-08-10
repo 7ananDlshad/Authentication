@@ -1,25 +1,37 @@
-import React from 'react';
-import logo from './logo.svg';
-import './App.css';
+import React, { useState, useEffect } from "react";
+import firebase from "./firebase";
+import Test from "./test";
+import { BrowserRouter as Router, Route } from "react-router-dom";
+import User from "./User";
 
 function App() {
+  const [uid, setUid] = useState("");
+  const [logged, setLogged] = useState(false);
+
+  useEffect(() => {
+    if (!logged)
+      firebase.auth().onAuthStateChanged((user) => {
+        if (user) {
+          setUid(user.uid);
+          setLogged(true);
+        }
+      });
+  }, [logged]);
+
+  const handleUid = (id) => {
+    setUid(id);
+  };
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+    <>
+      <Router>
+        <Route path="/" exact>
+          <Test handleUid={handleUid} />
+        </Route>
+        <Route path="/main">
+          <User uid={uid} />
+        </Route>
+      </Router>
+    </>
   );
 }
 
